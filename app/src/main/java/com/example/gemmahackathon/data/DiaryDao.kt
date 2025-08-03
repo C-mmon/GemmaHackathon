@@ -25,7 +25,7 @@ interface DiaryDao {
 
     //Tag related Operation
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTags(tags: List<Tag>)
+    suspend fun insertTag(tags: List<Tag>)
 
     @Query("DELETE FROM tags WHERE entryId = :entryId")
     suspend fun deleteTagsForEntry(entryId: Long)
@@ -38,6 +38,9 @@ interface DiaryDao {
     @Transaction
     @Query("SELECT * FROM entries WHERE isDeleted = 0 ORDER BY dateMillis DESC")
     suspend fun getAllDiaryWithTags(): List<DiaryWithTags>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertTag(tag: Tag)
 
     // DiaryAnalysis operations
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -88,4 +91,13 @@ interface DiaryDao {
     suspend fun getTone(entryId: Long): String?
 
 
+    //Delete functionality
+    @Query("DELETE FROM entries")
+    suspend fun clearAllEntries()
+
+    @Query("DELETE FROM tags")
+    suspend fun clearAllTags()
+
+    @Query("DELETE FROM DiaryAnalysis")
+    suspend fun clearAllAnalysis()
 }
