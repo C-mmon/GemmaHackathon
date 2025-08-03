@@ -1,0 +1,62 @@
+# === Android Studio & IntelliJ ===
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# === Gradle ===
+.gradle/
+build/
+*/build/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle-wrapper.properties
+
+# === Local Configuration ===
+local.properties
+*.keystore
+*.jks
+
+# === OS & Editor Files ===
+.DS_Store
+Thumbs.db
+
+# === Logs & Reports ===
+*.log
+*.hprof
+*.stacktrace
+*.crash
+*.tmp
+
+# === Generated Files ===
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+
+# === NDK & CMake ===
+.cxx/
+.externalNativeBuild/
+obj/
+
+# === Jetpack Compose previews ===
+*.preview.html
+*.preview.png
+*.preview.svg
+
+# === Cache ===
+.cache/
+captures/
+navigation.json
+
+# === Misc ===
+*.orig
+*.rej
+
+# === Kotlin specific ===
+*.kts~
+
+# === Asset files ===
+app/src/main/assets/**
