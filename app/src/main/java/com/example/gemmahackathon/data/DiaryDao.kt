@@ -55,4 +55,37 @@ interface DiaryDao {
     @Transaction
     @Query("SELECT * FROM entries WHERE id = :id")
     suspend fun getDiaryWithAnalysis(id: Long): DiaryWithAnalysis?
+
+
+    //Note: I have not tested this part, but to be tested
+    //My idea is that LLM  will provide the mood capiability and post that we shall be able to search here
+    //This provides an entire set of interface to interact with our diary analysis
+    @Query("SELECT * FROM DiaryAnalysis where mood = :mood")
+    suspend fun searchBySadMood(mood: String): List<DiaryAnalysis>
+
+    @Query("SELECT mood FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getMoodForEntry(entryId: Long): String?
+
+    @Query("SELECT moodConfidence FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getMoodConfidence(entryId: Long): Float?
+
+    @Query("SELECT summary FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getSummaryForEntry(entryId: Long): String?
+
+    @Query("SELECT reflectionQuestions FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getReflectionQuestions(entryId: Long): String?
+
+    @Query("SELECT writingStyle FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getWritingStyle(entryId: Long): String?
+
+    @Query("SELECT emotionDistribution FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getEmotionDistribution(entryId: Long): String?
+
+    @Query("SELECT stressLevel FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getStressLevel(entryId: Long): Int?
+
+    @Query("SELECT tone FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getTone(entryId: Long): String?
+
+
 }

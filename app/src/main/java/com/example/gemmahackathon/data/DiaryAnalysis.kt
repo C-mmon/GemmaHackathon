@@ -30,4 +30,14 @@ data class DiaryAnalysis(
     val emotionDistribution: String? = null, // JSON string: {"Joy":0.6,"Anger":0.1}
     val stressLevel: Int? = null,
     val tone: String? = null
+
+    //Future: Allow to store image and voice notes as part of the entry
+    // Since gemma 3n does not support inference based on direct voice and image, this will be something left for the future to think of
+
+    //Remembering my golden rules,
+    // Ui knows view model only : No room or LLM logic in UI
+    // view model knows ony use, keeps ui testable
+    //use case knows repo +logic
+    // repo knows room and gemma
+
 )
