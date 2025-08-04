@@ -69,27 +69,4 @@ fun updateDiaryEntry(entryId: Long, newText: String) {
 }
 ```
 
-Add this to dao function
-```
-@Query("DELETE FROM DiaryAnalysis WHERE entryId = :entryId")
-suspend fun deleteAnalysisByEntryId(entryId: Long)
 
-@Query("DELETE FROM tags WHERE entryId = :entryId")
-suspend fun deleteTagsByEntryId(entryId: Long)
-
-@Update
-suspend fun update(entry: DiaryEntry)
-```
-
-//Need to suggest mindfulness activity, 
-
-//Emotional Signature,
-//Highlight user important strength based on all past diary entry
-//Emotional summary for the week
-//Emoji for mood of each day
-//Visual Mood map (color of entry will change based on mood), size is tress,
-//Entry Linkings based on summary 
-//Mood goal alignment check, 
-//Allow user to set the mood and then check if the entries are alginign as per that or not
-//Personal growth tracker,
-//Future Reflection Prediction
