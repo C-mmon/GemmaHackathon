@@ -1,10 +1,9 @@
-package com.example.gemmahackathon.data
+package com.example.gemmahackathon.data.diary
 
 import androidx.room.*
 
 @Dao
 interface DiaryDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entry: DiaryEntry): Long
 
@@ -100,4 +99,8 @@ interface DiaryDao {
 
     @Query("DELETE FROM DiaryAnalysis")
     suspend fun clearAllAnalysis()
+
+    //This feature needs to be supported, user editing its old entry will end up deleting entire diaryAnalysis
+    //@Update
+    //suspend fun update(entry: DiaryEntry)
 }

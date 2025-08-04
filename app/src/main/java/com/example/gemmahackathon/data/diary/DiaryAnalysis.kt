@@ -1,4 +1,4 @@
-package com.example.gemmahackathon.data
+package com.example.gemmahackathon.data.diary
 
 import androidx.room.Entity
 import androidx.room.ForeignKey

@@ -13,10 +13,12 @@ import androidx.lifecycle.lifecycleScope
 import android.util.Log // For Log
 import kotlinx.coroutines.launch
 import com.example.gemmahackathon.data.DiaryDatabase
-import com.example.gemmahackathon.data.DiaryEntry
-import com.example.gemmahackathon.data.Tag
+import com.example.gemmahackathon.data.diary.DiaryEntry
+import com.example.gemmahackathon.data.diary.Tag
+import com.example.gemmahackathon.data.user.UserEntity
 import com.example.gemmahackathon.domain.Logic.GemmaClient
 import com.example.gemmahackathon.domain.Logic.GemmaParser
+
 
 
 
@@ -40,6 +42,21 @@ class MainActivity : ComponentActivity() {
             dao.clearAllTags()
             dao.clearAllAnalysis()
             dao.clearAllEntries()
+
+            //Testing user profile section
+            val userDao = db.userDao()
+            val existing = userDao.getUser()
+            if (existing == null) {
+                userDao.insert(UserEntity(name = "Aniket", about = "curious learner"))
+            }
+            val user = UserEntity(name="Aniket", about = "curious Learner")
+            userDao.insert(user)
+            val userProfile = userDao.getUser()
+            userProfile?.let {
+                Log.d("UserProfile", "Name: ${it.name}")
+                Log.d("UserProfile", "About: ${it.about}")
+                Log.d("UserProfile", "MoodColor: ${it.visualMoodColour}")
+            }
 
             val entry = DiaryEntry(text = "Today I felt a bit anxious but hopeful.", isDeleted = false)
             val entryId = dao.insert(entry)

@@ -25,6 +25,8 @@ class GemmaClient(private val context: Context)
         val path = locateModelFile() ?: throw IllegalStateException("Gemma model not found")
         Log.i(TAG, "Using model at: $path")
 
+        //For production: Add support to avoid running in llm mode.
+
         val options = LlmInference.LlmInferenceOptions.builder()
             .setModelPath(path)
             .build()

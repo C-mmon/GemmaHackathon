@@ -1,4 +1,4 @@
-package com.example.gemmahackathon.data
+package com.example.gemmahackathon.data.diary
 import androidx.room.Embedded
 import androidx.room.Relation
 

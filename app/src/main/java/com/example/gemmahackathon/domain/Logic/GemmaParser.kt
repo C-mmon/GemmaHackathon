@@ -1,6 +1,6 @@
 package com.example.gemmahackathon.domain.Logic
 
-import com.example.gemmahackathon.data.DiaryAnalysis
+import com.example.gemmahackathon.data.diary.DiaryAnalysis
 import org.json.JSONObject
 
 /**
