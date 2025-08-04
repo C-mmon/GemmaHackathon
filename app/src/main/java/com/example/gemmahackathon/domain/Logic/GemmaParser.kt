@@ -2,7 +2,7 @@ package com.example.gemmahackathon.domain.Logic
 
 import com.example.gemmahackathon.data.diary.DiaryAnalysis
 import org.json.JSONObject
-
+import android.util.Log
 /**
  * Result of LLM analysis parsing.
  * Contains both the structured analysis and the list of tags.
@@ -18,7 +18,7 @@ object GemmaParser {
      * Parses the LLM's JSON reply into a DiaryAnalysis object and a list of tags.
      *
      * @param reply Raw response string from Gemma
-     * @param entryId The ID of the DiaryEntry this analysis is for
+     * @param entryId The ID of the DiaryEntry this analysis is for something which I thought was useful but is not now
      * @return [AnalysisResult] containing parsed analysis and tags, or null if parsing failed
      */
     fun parse(reply: String?, entryId: Long): AnalysisResult? {
@@ -52,6 +52,26 @@ object GemmaParser {
             AnalysisResult(analysis, tags)
         } catch (e: Exception) {
             e.printStackTrace()
+            null
+        }
+    }
+
+    fun parseTagsArray(raw: String?): List<String>? {
+        if (raw.isNullOrBlank()) return null
+
+        return try {
+            val cleanJson = raw
+                .replace("```json", "")
+                .replace("```", "")
+                .trim()
+
+            val json = JSONObject(cleanJson)
+            val jsonArray = json.optJSONArray("tags")
+                ?: throw IllegalArgumentException("Missing 'tags' field")
+
+            List(jsonArray.length()) { i -> jsonArray.getString(i) }
+        } catch (e: Exception) {
+            Log.e("GemmaParser", "Failed to parse tags: ${e.message}")
             null
         }
     }

@@ -18,7 +18,13 @@ import com.example.gemmahackathon.data.diary.Tag
 import com.example.gemmahackathon.data.user.UserEntity
 import com.example.gemmahackathon.domain.Logic.GemmaClient
 import com.example.gemmahackathon.domain.Logic.GemmaParser
-
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import com.example.gemmahackathon.viewModel.DiaryViewModel
+import androidx.compose.ui.unit.dp
 
 
 
@@ -29,14 +35,27 @@ class MainActivity : ComponentActivity() {
 // whatever you held earlier
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { Text("Loading Gemma…") }
+    val db = DiaryDatabase.getDatabase(this@MainActivity)
+    val dao = db.diaryDao()
 
+
+
+    lifecycleScope.launch {
+        val gemma = GemmaClient(this@MainActivity)
+        gemma.initialize()
+        val diaryViewModel = DiaryViewModel(dao, gemma)
+        setContent {
+            TestDiaryView(viewModel = diaryViewModel)
+        }
+
+    }
+
+
+
+/*
         lifecycleScope.launch {
-            val gemma = GemmaClient(this@MainActivity)
-            gemma.initialize()
 
-            val db = DiaryDatabase.getDatabase(this@MainActivity)
-            val dao = db.diaryDao()
+
 
             //Temp solution: was getting multiple entries for the same time
             dao.clearAllTags()
@@ -87,7 +106,7 @@ class MainActivity : ComponentActivity() {
             Log.d("TestResult", "Tone: ${resultParsed?.analysis?.tone}")
             Log.d("TestResult", "Questions: ${resultParsed?.analysis?.reflectionQuestions}")
 
-        }
+        } */
     }
 }
 
@@ -105,6 +124,48 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 fun GreetingPreview() {
     GemmaHackathonTheme {
         Greeting("Android")
+    }
+}
+
+@Composable
+fun TestDiaryView(viewModel: DiaryViewModel) {
+    val uiState by viewModel.uiState.collectAsState()
+    var text by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        OutlinedTextField(
+            value = text,
+            onValueChange = { text = it },
+            label = { Text("Diary Text") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Button(onClick = {
+            scope.launch {
+                viewModel.createEntry(text)
+                text = ""
+            }
+        }) {
+            Text("Create Entry")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (uiState.isLoading) {
+            Text("Loading...")
+        }
+
+        LazyColumn {
+            items(uiState.entries) { entry ->
+                Text("Entry: ${entry.diaryEntry.text}")
+                entry.tags.forEach { tag ->
+                    Text(" • ${tag.name}")
+                }
+            }
+        }
     }
 }
 

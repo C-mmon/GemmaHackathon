@@ -1,6 +1,7 @@
 package com.example.gemmahackathon.data.diary
 
 import androidx.room.*
+import kotlinx.coroutines.flow.*
 
 @Dao
 interface DiaryDao {
@@ -36,7 +37,8 @@ interface DiaryDao {
 
     @Transaction
     @Query("SELECT * FROM entries WHERE isDeleted = 0 ORDER BY dateMillis DESC")
-    suspend fun getAllDiaryWithTags(): List<DiaryWithTags>
+    fun getAllDiaryWithTags(): Flow<List<DiaryWithTags>> //Flow<List<DiaryWithTags>>
+    //Flow automatically emits a new list every time the data in the database changes
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTag(tag: Tag)

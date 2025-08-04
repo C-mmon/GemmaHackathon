@@ -21,6 +21,8 @@ class GemmaClient(private val context: Context)
 
     }
 
+
+    //kotlin restricts susepend function like withContext to only be used insidde another susepend function
     suspend fun initialize() {
         val path = locateModelFile() ?: throw IllegalStateException("Gemma model not found")
         Log.i(TAG, "Using model at: $path")
@@ -36,9 +38,10 @@ class GemmaClient(private val context: Context)
         }
     }
 
+    //Updating to return null
     suspend fun analyzeText(entryText: String): String? {
         val prompt = """
-            Analyze the following diary entry and return a JSON with:
+            Analyze the following diary entry, if the diary entry is short, return NULL,and return a JSON with:
             - mood, moodConfidence, summary, reflectionQuestions, writingStyle, emotionDistribution, stressLevel, tone
             Entry:
             "$entryText"
@@ -48,7 +51,21 @@ class GemmaClient(private val context: Context)
             llm?.generateResponse(prompt)
         }
     }
-    
+
+    suspend fun generateDiaryEntryTags(entryText: String): String? {
+        val prompt = """
+            Analyze the following diary entry and return a JSON with only 3 tags entries that are appropriate for the give:
+            - tags
+            Entry:
+            "$entryText"
+        """.trimIndent()
+
+        return withContext(Dispatchers.Default) {
+            llm?.generateResponse(prompt)
+        }
+    }
+
+
     fun close() {
         llm?.close()
     }
