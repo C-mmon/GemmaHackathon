@@ -26,8 +26,10 @@ fun HomeScreen(
     val reflectionQuestions by diaryViewModel.reflectionQuestions.collectAsState()
     val summary by diaryViewModel.summary.collectAsState()
     val events by diaryViewModel.events.collectAsState(initial = null)
-    
+
+    //Diary is backed by remember {mutableState of "", this is making diary a state, so when we update it diaryText, the UI recomposes
     var diaryText by remember { mutableStateOf("") }
+
     var lastCreatedEntryId by remember { mutableStateOf<Long?>(null) }
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
@@ -75,25 +77,19 @@ fun HomeScreen(
                 SectionHeader("Today's Reflection")
                 Spacer(modifier = Modifier.height(8.dp))
                 val reflectionColor = Color(0xFF64B5F6) // This is the color of the reflection question
-                
-                if (reflectionQuestions != null) {
-                    Text(
-                        text = reflectionQuestions!!,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = reflectionColor,
-                        lineHeight = 20.sp
-                    )
-                } else {
-                    Text(
-                        text = "• How are you feeling today?\n" +
-                              "• What's on your mind right now?\n" +
-                              "• What are you grateful for today?\n" +
-                              "• What challenged you today?",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        lineHeight = 20.sp
-                    )
+                if (!reflectionQuestions.isNullOrBlank()) {
+                    Column {
+                        reflectionQuestions!!.split(",").forEach { question ->
+                            Text(
+                                text = "• ${question.trim()}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = reflectionColor,
+                                lineHeight = 20.sp
+                            )
+                        }
+                    }
                 }
+
             }
 
             // Diary Entry Input Section
@@ -119,8 +115,11 @@ fun HomeScreen(
                     onClick = {
                         if (diaryText.isNotBlank()) {
                             scope.launch {
-                                diaryViewModel.createEntry(diaryText)
-                                diaryText = ""
+
+                                //There is some race condition, cannot figure out why
+                                val textShow = diaryText
+                                diaryText=""
+                                diaryViewModel.createEntry(textShow)
                             }
                         }
                     },
