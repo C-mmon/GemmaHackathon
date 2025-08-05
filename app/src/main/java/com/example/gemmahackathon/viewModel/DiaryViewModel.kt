@@ -17,7 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import android.util.Log
-import com.example.gemmahackathon.data.user.UserDao
+import com.example.gemmahackathon.data.DiaryDatabase
+import androidx.room.withTransaction
 
 
 /* ---------- Dispatcher abstraction for testability ---------- */
@@ -45,6 +46,7 @@ class DiaryViewModel(
     private val diaryDao: DiaryDao,
     private val gemmaClient: GemmaClient,
     private val userViewModel: UserViewModel,
+    private val database: DiaryDatabase,
     private val dispatchers: DispatcherProvider = DefaultDispatchers,
 ) : ViewModel() {
 
@@ -98,6 +100,8 @@ class DiaryViewModel(
             Log.d("DiaryViewModel", "Inserted entry with ID: $entryId")
 
             //Ask LLM to analyse Text
+
+
             val raw = gemmaClient.analyzeText(text)
             Log.d("Gemma", "Raw LLM response: $raw")
 
@@ -113,10 +117,14 @@ class DiaryViewModel(
             Log.d("Gemma", "Raw LLM tag response: $rawTags")
             val tagOnlyResult = GemmaParser.parseTagsArray(rawTags)
 
-            tagOnlyResult?.forEach { tag ->
-                Log.d("Gemma", "Parsed tag (from tag generator): $tag")
-                diaryDao.insertTag(Tag(entryId = entryId, name = tag))
+            database.withTransaction {
+                val dvmId = diaryDao.insert(DiaryEntry(text = text, isDeleted = false))
+                parsed?.analysis?.let { diaryDao.insertAnalysis(it.copy(entryId = dvmId)) }
+                tagOnlyResult?.forEach { tag ->
+                    diaryDao.insertTag(Tag(entryId = dvmId, name = tag))
+                }
             }
+
 
         }.onFailure { throwable ->
             _events.emit(DiaryUiEvent.ShowError(throwable.message ?: "Unknown error"))
