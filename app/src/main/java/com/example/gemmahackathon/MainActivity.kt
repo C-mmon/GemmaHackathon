@@ -25,6 +25,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import com.example.gemmahackathon.viewModel.DiaryViewModel
 import androidx.compose.ui.unit.dp
+import com.example.gemmahackathon.viewModel.UserViewModel
+import com.example.gemmahackathon.viewModel.UserViewModelFactory
 
 
 
@@ -37,13 +39,16 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
     val db = DiaryDatabase.getDatabase(this@MainActivity)
     val dao = db.diaryDao()
+    val userDao = db.userDao()
 
-
+    //For now, keeping this here,
+    val userViewModelFactory = UserViewModelFactory(userDao)
+    val userViewModel = UserViewModel(userDao)
 
     lifecycleScope.launch {
         val gemma = GemmaClient(this@MainActivity)
         gemma.initialize()
-        val diaryViewModel = DiaryViewModel(dao, gemma)
+        val diaryViewModel = DiaryViewModel(dao, gemma, userViewModel)
         setContent {
             TestDiaryView(viewModel = diaryViewModel)
         }

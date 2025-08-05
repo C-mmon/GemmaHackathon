@@ -8,6 +8,7 @@ import com.example.gemmahackathon.domain.Logic.GemmaParser
 import com.example.gemmahackathon.data.diary.DiaryEntry
 import com.example.gemmahackathon.data.diary.DiaryWithTags
 import com.example.gemmahackathon.domain.Logic.GemmaClient
+import com.example.gemmahackathon.viewModel.UserViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.example.gemmahackathon.data.user.UserDao
 
 
 /* ---------- Dispatcher abstraction for testability ---------- */
@@ -42,7 +44,8 @@ sealed interface DiaryUiEvent {
 class DiaryViewModel(
     private val diaryDao: DiaryDao,
     private val gemmaClient: GemmaClient,
-    private val dispatchers: DispatcherProvider = DefaultDispatchers
+    private val userViewModel: UserViewModel,
+    private val dispatchers: DispatcherProvider = DefaultDispatchers,
 ) : ViewModel() {
 
     //state

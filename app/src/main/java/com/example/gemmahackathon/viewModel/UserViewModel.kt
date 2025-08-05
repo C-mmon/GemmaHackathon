@@ -1,4 +1,4 @@
-package com.example.gemmahackathon.viewmodel
+package com.example.gemmahackathon.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

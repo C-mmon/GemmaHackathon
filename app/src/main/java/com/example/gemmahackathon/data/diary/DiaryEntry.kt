@@ -12,6 +12,5 @@ data class DiaryEntry(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val entryColor: String? = null //Each unique entry will have a colour associated to it, suggested by gemma
-
     //Room Does not store list directly
 )
