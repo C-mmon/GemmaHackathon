@@ -123,6 +123,8 @@ class DiaryViewModel(
                     diaryDao.insertTag(Tag(entryId = dvmId, name = tag))
                 }
             }
+            //For now, we want to allow each entry update existing user profile.
+            //But in future support, we want to
         }.onFailure { throwable ->
             _events.emit(DiaryUiEvent.ShowError(throwable.message ?: "Unknown error"))
         }

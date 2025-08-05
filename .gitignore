@@ -60,3 +60,4 @@ navigation.json
 
 # === Asset files ===
 app/src/main/assets/**
+model_storage/gemma-3n-E2B-it-int4.task

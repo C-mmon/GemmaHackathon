@@ -67,7 +67,7 @@ fun CalendarScreen(
                 text = "Calendar",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF8A2BE2).copy(alpha = 0.7f), // Purple color for text
+                color = Color(0xFFF06292).copy(alpha = 0.7f), // Pink color for text
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             
@@ -223,8 +223,7 @@ fun CalendarScreen(
                         text = entry.diaryEntry.text,
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color(0xFF8A2BE2) ,// Purple color for text,
-                        lineHeight = 20.sp
-                    )
+                        lineHeight = 20.sp                    )
 
                     if (entry.tags.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(12.dp))

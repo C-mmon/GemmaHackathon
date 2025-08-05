@@ -1,27 +1,16 @@
 package com.example.gemmahackathon
 
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.gemmahackathon.ui.theme.GemmaHackathonTheme
 import androidx.lifecycle.lifecycleScope
-import android.util.Log // For Log
 import kotlinx.coroutines.launch
 import com.example.gemmahackathon.data.DiaryDatabase
-import com.example.gemmahackathon.data.diary.DiaryEntry
-import com.example.gemmahackathon.data.diary.Tag
-import com.example.gemmahackathon.data.user.UserEntity
 import com.example.gemmahackathon.domain.Logic.GemmaClient
-import com.example.gemmahackathon.domain.Logic.GemmaParser
 import com.example.gemmahackathon.ui.navigation.DiaryNavigation
 import com.example.gemmahackathon.viewModel.DiaryViewModel
 import com.example.gemmahackathon.viewModel.UserViewModel
-import com.example.gemmahackathon.viewModel.UserViewModelFactory
 
 
 
@@ -55,24 +44,5 @@ class MainActivity : ComponentActivity() {
     }
     }
 }
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    GemmaHackathonTheme {
-        Greeting("Android")
-    }
-}
-
-// Removed TestDiaryView - replaced with new navigation structure
 
 

@@ -1,13 +1,12 @@
 package com.example.gemmahackathon.domain.Logic
 
 import com.google.mediapipe.tasks.genai.llminference.LlmInference
+import com.google.mediapipe.tasks.vision.imageclassifier.ImageClassifier
 import android.content.Context
-
-import android.util.Log          // for Log.i / Log.e
+import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File              // for File()
-
+import java.io.File
 class GemmaClient(private val context: Context)
 {
     private var llm: LlmInference? = null
@@ -18,9 +17,10 @@ class GemmaClient(private val context: Context)
     {
         private const val TAG ="GemmaClient"
         private const val MODEL_FILENAME = "gemma-3n-E2B-it-int4.task"
+        const val DEFAULT_MAX_TOKENS = 200
+        const val DEFAULT_TOP_K = 0
 
     }
-
 
     //kotlin restricts susepend function like withContext to only be used insidde another susepend function
     suspend fun initialize() {
@@ -28,10 +28,12 @@ class GemmaClient(private val context: Context)
         Log.i(TAG, "Using model at: $path")
 
         //For production: Add support to avoid running in llm mode.
-
-        val options = LlmInference.LlmInferenceOptions.builder()
-            .setModelPath(path)
-            .build()
+        val options =
+            LlmInference.LlmInferenceOptions.builder()
+                .setModelPath(path)
+                .setMaxTokens(DEFAULT_MAX_TOKENS)
+                .setMaxTopK(DEFAULT_TOP_K)
+                .build()
 
         withContext(Dispatchers.Default) {
             llm = LlmInference.createFromOptions(context, options)

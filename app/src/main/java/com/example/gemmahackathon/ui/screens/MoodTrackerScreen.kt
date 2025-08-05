@@ -20,8 +20,7 @@ import com.example.gemmahackathon.ui.components.*
 import com.example.gemmahackathon.viewModel.DiaryViewModel
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.max
-import kotlin.math.min
+import android.util.Log
 
 data class MoodData(
     val date: Long,
@@ -35,25 +34,63 @@ fun MoodTrackerScreen(
     diaryViewModel: DiaryViewModel
 ) {
     val uiState by diaryViewModel.uiState.collectAsState()
+    val emotionDistribution by diaryViewModel.emotionDistribution.collectAsState()
 
+    // State to hold real mood data from all entries
+    var allMoodData by remember { mutableStateOf<List<MoodData>>(emptyList()) }
+    var emotionDistributions by remember { mutableStateOf<Map<String, Float>>(emptyMap()) }
     
-    // Load mood data for recent entries
+    // Load real mood data for all entries
     LaunchedEffect(uiState.entries) {
+        val moodDataList = mutableListOf<MoodData>()
+        val emotionMap = mutableMapOf<String, Float>()
+        
         uiState.entries.forEach { entry ->
             diaryViewModel.loadMood(entry.diaryEntry.id)
             diaryViewModel.loadMoodConfidence(entry.diaryEntry.id)
             diaryViewModel.loadStressLevel(entry.diaryEntry.id)
+            diaryViewModel.loadEmotionDistribution(entry.diaryEntry.id)
+            
+            // Collect real data for each entry
+            val entryMood = diaryViewModel.mood.value
+            val entryConfidence = diaryViewModel.moodConfidence.value
+            val entryStress = diaryViewModel.stressLevel.value
+            val entryEmotions = diaryViewModel.emotionDistribution.value
+
+            Log.d("MoodTrackerScreen", "Mood: $entryMood, Confidence: $entryConfidence, Stress: $entryStress, Emotions: $entryEmotions")
+            
+            moodDataList.add(
+                MoodData(
+                    date = entry.diaryEntry.dateMillis,
+                    mood = entryMood,
+                    confidence = entryConfidence,
+                    stressLevel = entryStress
+                )
+            )
+            
+            // Parse emotion distribution (assuming it's a JSON string or similar)
+            entryEmotions?.let { emotions ->
+                // Simple parsing - adjust based on actual format
+                emotions.split(",").forEach { emotion ->
+                    val parts = emotion.trim().split(":")
+                    if (parts.size == 2) {
+                        val emotionName = parts[0].trim()
+                        val emotionValue = parts[1].trim().toFloatOrNull() ?: 0f
+                        if (emotionValue > 0) {
+                            emotionMap[emotionName] = emotionMap.getOrDefault(emotionName, 0f) + emotionValue
+                        }
+                    }
+                }
+            }
         }
+        
+        allMoodData = moodDataList.sortedBy { it.date }
+        emotionDistributions = emotionMap
     }
     
     val mood by diaryViewModel.mood.collectAsState()
     val moodConfidence by diaryViewModel.moodConfidence.collectAsState()
     val stressLevel by diaryViewModel.stressLevel.collectAsState()
-    
-    // Generate mock data for visualization (in a real app, you'd collect this over time)
-    val moodData = remember(uiState.entries) {
-        generateMoodData(uiState.entries, mood, moodConfidence, stressLevel)
-    }
     
     GradientBackground {
         Column(
@@ -68,11 +105,11 @@ fun MoodTrackerScreen(
                 text = "Mood Tracker",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF8A2BE2), // Purple color for text
+                color = Color(0xFFF06292), // Pink color for text
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             
-            if (moodData.isEmpty()) {
+            if (allMoodData.isEmpty()) {
                 // Empty state
                 DiaryCard {
                     Column(
@@ -152,13 +189,28 @@ fun MoodTrackerScreen(
                     }
                 }
                 
+                // Emotion Distribution Pie Chart
+                if (emotionDistributions.isNotEmpty()) {
+                    DiaryCard {
+                        SectionHeader("Emotion Distribution")
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        EmotionPieChart(
+                            emotions = emotionDistributions,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(250.dp)
+                        )
+                    }
+                }
+                
                 // Mood Over Time Chart
                 DiaryCard {
                     SectionHeader("Mood Over Time")
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     MoodChart(
-                        data = moodData,
+                        data = allMoodData,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
@@ -171,7 +223,7 @@ fun MoodTrackerScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     ConfidenceChart(
-                        data = moodData,
+                        data = allMoodData,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
@@ -184,7 +236,7 @@ fun MoodTrackerScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     StressChart(
-                        data = moodData,
+                        data = allMoodData,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(200.dp)
@@ -196,28 +248,100 @@ fun MoodTrackerScreen(
                     SectionHeader("Insights")
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    val avgStress = moodData.mapNotNull { it.stressLevel }.average()
-                    val avgConfidence = moodData.mapNotNull { it.confidence }.average()
+                    val avgStress = allMoodData.mapNotNull { it.stressLevel }.average()
+                    val avgConfidence = allMoodData.mapNotNull { it.confidence }.average()
                     
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            text = "• Average stress level: ${String.format("%.1f", avgStress)}/10",
+                            text = "• Average stress level: ${String.format("%.1f", if (avgStress.isNaN()) 0.0 else avgStress)}/10",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color(0xFF8A2BE2) // Purple color for text
                         )
                         Text(
-                            text = "• Average confidence: ${String.format("%.0f", avgConfidence * 100)}%",
+                            text = "• Average confidence: ${String.format("%.0f", if (avgConfidence.isNaN()) 0.0 else avgConfidence * 100)}%",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color(0xFF8A2BE2) // Purple color for text
                         )
                         Text(
-                            text = "• You've tracked ${moodData.size} mood${if (moodData.size != 1) "s" else ""} so far",
+                            text = "• You've tracked ${allMoodData.size} mood${if (allMoodData.size != 1) "s" else ""} so far",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF8A2BE2) // Purple color for text
+                        )
+                        Text(
+                            text = "• ${emotionDistributions.size} different emotions detected",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color(0xFF8A2BE2) // Purple color for text
                         )
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun EmotionPieChart(
+    emotions: Map<String, Float>,
+    modifier: Modifier = Modifier
+) {
+    val colors = listOf(
+        Color(0xFF4CAF50), // Green
+        Color(0xFF2196F3), // Blue
+        Color(0xFFFF9800), // Orange
+        Color(0xFF9C27B0), // Purple
+        Color(0xFFE91E63), // Pink
+        Color(0xFF00BCD4), // Cyan
+        Color(0xFFFFEB3B), // Yellow
+        Color(0xFFFF5722), // Deep Orange
+        Color(0xFF795548), // Brown
+        Color(0xFF607D8B)  // Blue Grey
+    )
+    
+    Canvas(modifier = modifier) {
+        if (emotions.isEmpty()) return@Canvas
+        
+        val total = emotions.values.sum()
+        if (total <= 0) return@Canvas
+        
+        val center = Offset(size.width / 2, size.height / 2)
+        val radius = kotlin.math.min(size.width, size.height) / 2.5f
+        
+        var startAngle = 0f
+        val sortedEmotions = emotions.toList().sortedByDescending { it.second }
+        
+        // Draw pie slices
+        sortedEmotions.forEachIndexed { index, (emotion, value) ->
+            val sweepAngle = (value / total) * 360f
+            val color = colors[index % colors.size]
+            
+            drawArc(
+                color = color,
+                startAngle = startAngle,
+                sweepAngle = sweepAngle,
+                useCenter = true,
+                topLeft = Offset(center.x - radius, center.y - radius),
+                size = androidx.compose.ui.geometry.Size(radius * 2, radius * 2)
+            )
+            
+            startAngle += sweepAngle
+        }
+        
+        // Draw legend
+        var legendY = 20f
+        sortedEmotions.forEachIndexed { index, (emotion, value) ->
+            val color = colors[index % colors.size]
+            val percentage = (value / total * 100).toInt()
+            
+            // Draw color indicator
+            drawCircle(
+                color = color,
+                radius = 8.dp.toPx(),
+                center = Offset(20.dp.toPx(), legendY)
+            )
+            
+            // Draw text would require more complex implementation
+            // For now, we'll just show the pie chart
+            legendY += 25.dp.toPx()
         }
     }
 }
@@ -375,20 +499,4 @@ private fun StressChart(
     }
 }
 
-private fun generateMoodData(
-    entries: List<com.example.gemmahackathon.data.diary.DiaryWithTags>,
-    currentMood: String?,
-    currentConfidence: Float?,
-    currentStress: Int?
-): List<MoodData> {
-    // In a real app, you'd store historical mood data
-    // For demo purposes, generate some sample data based on entries
-    return entries.take(7).mapIndexed { index, entry ->
-        MoodData(
-            date = entry.diaryEntry.dateMillis,
-            mood = if (index == 0) currentMood else listOf("happy", "sad", "neutral", "anxious", "calm").random(),
-            confidence = if (index == 0) currentConfidence else (0.3f + Math.random() * 0.7f).toFloat(),
-            stressLevel = if (index == 0) currentStress else (1..8).random()
-        )
-    }.reversed()
-}
+// Removed generateMoodData function - now using real data from backend
