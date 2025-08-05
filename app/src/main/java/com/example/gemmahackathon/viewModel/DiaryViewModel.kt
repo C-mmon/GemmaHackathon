@@ -113,23 +113,19 @@ class DiaryViewModel(
             Log.d("Gemma", "Parsed analysis: ${parsed?.analysis}")
 
             // 2. Run separate tag generation (if needed)
-            val rawTags = gemmaClient.generateDiaryEntryTags(text)
-            Log.d("Gemma", "Raw LLM tag response: $rawTags")
-            val tagOnlyResult = GemmaParser.parseTagsArray(rawTags)
+            // val rawTags = gemmaClient.generateDiaryEntryTags(text) <-  avoid calling this now
 
+            //We want the database entry to be one atomic operation
             database.withTransaction {
                 val dvmId = diaryDao.insert(DiaryEntry(text = text, isDeleted = false))
                 parsed?.analysis?.let { diaryDao.insertAnalysis(it.copy(entryId = dvmId)) }
-                tagOnlyResult?.forEach { tag ->
+                parsed?.tags?.forEach { tag ->
                     diaryDao.insertTag(Tag(entryId = dvmId, name = tag))
                 }
             }
-
-
         }.onFailure { throwable ->
             _events.emit(DiaryUiEvent.ShowError(throwable.message ?: "Unknown error"))
         }
-
         setLoading(false)
     }
 

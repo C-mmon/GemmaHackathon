@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import com.example.gemmahackathon.ui.components.*
 import com.example.gemmahackathon.viewModel.DiaryViewModel
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -106,7 +107,8 @@ fun HomeScreen(
                         .height(120.dp),
                     minLines = 4,
                     maxLines = 6,
-                    enabled = !uiState.isLoading
+                    enabled = !uiState.isLoading,
+                    textStyle = TextStyle(color = Color(0xFF64B5F6))
                 )
                 
                 Spacer(modifier = Modifier.height(12.dp))

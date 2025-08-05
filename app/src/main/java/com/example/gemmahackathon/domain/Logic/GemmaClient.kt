@@ -39,10 +39,13 @@ class GemmaClient(private val context: Context)
     }
 
     //Updating to return null
+    // So for now, let analyze text and return tags as well,
+    //avoid calling llm too much
     suspend fun analyzeText(entryText: String): String? {
         val prompt = """
-            Analyze the following diary entry, if the diary entry is short, return NULL,or return a JSON with:
-            - mood, moodConfidence, summary, reflectionQuestions, writingStyle, emotionDistribution, stressLevel, tone
+            Analyze the following diary entry, if the diary entry is short, return NULL,or return a JSON with, Also Note:
+             You can only return three tags for now
+            - mood, moodConfidence, summary, reflectionQuestions, writingStyle, emotionDistribution, stressLevel, tone, tags
             Entry:
             "$entryText"
         """.trimIndent()
@@ -52,6 +55,7 @@ class GemmaClient(private val context: Context)
         }
     }
 
+    //Future Feature: if in case, we want to integrate notes building, then we can call this section
     suspend fun generateDiaryEntryTags(entryText: String): String? {
         val prompt = """
             Analyze the following diary entry and return a JSON with only 3 tags entries that are appropriate for the give:

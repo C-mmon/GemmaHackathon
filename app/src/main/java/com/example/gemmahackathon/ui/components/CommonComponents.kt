@@ -73,9 +73,7 @@ fun DiaryCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.9f)
-        ),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFF0)),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(12.dp)
     ) {

@@ -10,6 +10,7 @@ import com.example.gemmahackathon.data.user.UserEntity
  */
 data class AnalysisResult(
     val analysis: DiaryAnalysis,
+    //We are already supporting returning Analysis result as part of the tags
     val tags: List<String>
 )
 
