@@ -1,6 +1,7 @@
 package com.example.gemmahackathon.data.user
 
 import androidx.room.*
+import kotlinx.coroutines.flow.*
 
 @Dao
 interface UserDao {
@@ -8,9 +9,8 @@ interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: UserEntity)
 
-    // Fetch the user profile (we are in single-user scenario)
     @Query("SELECT * FROM UserProfile LIMIT 1")
-    suspend fun getUser(): UserEntity?
+    fun getUserFlow(): Flow<UserEntity?> //Again declaring this as a Flow, because we want dynamic update
 
     // Update the existing profile
     @Update

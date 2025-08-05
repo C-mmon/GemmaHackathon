@@ -39,7 +39,6 @@ sealed interface DiaryUiEvent {
     data class ShowError(val message: String) : DiaryUiEvent
 }
 /*******View Model******/
-
 class DiaryViewModel(
     private val diaryDao: DiaryDao,
     private val gemmaClient: GemmaClient,
@@ -49,6 +48,30 @@ class DiaryViewModel(
     //state
     private val _uiState = MutableStateFlow(DiaryUiState())
     val uiState: StateFlow<DiaryUiState> = _uiState.asStateFlow()
+
+    private val _mood = MutableStateFlow<String?>(null)
+    val mood: StateFlow<String?> = _mood.asStateFlow()
+
+    private val _moodConfidence = MutableStateFlow<Float?>(null)
+    val moodConfidence: StateFlow<Float?> = _moodConfidence.asStateFlow()
+
+    private val _summary = MutableStateFlow<String?>(null)
+    val summary: StateFlow<String?> = _summary.asStateFlow()
+
+    private val _tone = MutableStateFlow<String?>(null)
+    val tone: StateFlow<String?> = _tone.asStateFlow()
+
+    private val _stressLevel = MutableStateFlow<Int?>(null)
+    val stressLevel: StateFlow<Int?> = _stressLevel.asStateFlow()
+
+    private val _emotionDistribution = MutableStateFlow<String?>(null)
+    val emotionDistribution: StateFlow<String?> = _emotionDistribution.asStateFlow()
+
+    private val _reflectionQuestions = MutableStateFlow<String?>(null)
+    val reflectionQuestions: StateFlow<String?> = _reflectionQuestions.asStateFlow()
+
+    private val _writingStyle = MutableStateFlow<String?>(null)
+    val writingStyle: StateFlow<String?> = _writingStyle.asStateFlow()
 
     /* One-shot events */
     private val _events = MutableSharedFlow<DiaryUiEvent>()
@@ -97,6 +120,103 @@ class DiaryViewModel(
         }
 
         setLoading(false)
+    }
+
+    //Thumb of rule, when updating MutableStateFlow, always update like this
+    // __stateFlow = newValue
+
+    fun loadMood(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                val result = diaryDao.getMoodForEntry(entryId)
+                _mood.value = result
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading mood: ${e.message}"))
+            }
+        }
+    }
+
+    fun loadSummary(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                val result = diaryDao.getSummaryForEntry(entryId)
+                _summary.value = result
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading summary: ${e.message}"))
+            }
+        }
+    }
+
+    fun loadMoodConfidence(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                val result = diaryDao.getMoodConfidence(entryId)
+                _moodConfidence.value = result
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading summary: ${e.message}"))
+            }
+        }
+    }
+
+    fun getStressLevel(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                val result = diaryDao.getMoodConfidence(entryId)
+                _moodConfidence.value = result
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading summary: ${e.message}"))
+            }
+        }
+    }
+
+    fun loadTone(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                _tone.value = diaryDao.getTone(entryId)
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading tone: ${e.message}"))
+            }
+        }
+    }
+
+    fun loadStressLevel(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                _stressLevel.value = diaryDao.getStressLevel(entryId)
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading stress level: ${e.message}"))
+            }
+        }
+    }
+
+    fun loadEmotionDistribution(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                _emotionDistribution.value = diaryDao.getEmotionDistribution(entryId)
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading emotion distribution: ${e.message}"))
+            }
+        }
+    }
+
+    fun loadReflectionQuestions(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                _reflectionQuestions.value = diaryDao.getReflectionQuestions(entryId)
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading reflection questions: ${e.message}"))
+            }
+        }
+    }
+
+    fun loadWritingStyle(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                _writingStyle.value = diaryDao.getWritingStyle(entryId)
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading writing style: ${e.message}"))
+            }
+        }
     }
 
     /* Internal Helper */

@@ -3,6 +3,7 @@ package com.example.gemmahackathon.domain.Logic
 import com.example.gemmahackathon.data.diary.DiaryAnalysis
 import org.json.JSONObject
 import android.util.Log
+import com.example.gemmahackathon.data.user.UserEntity
 /**
  * Result of LLM analysis parsing.
  * Contains both the structured analysis and the list of tags.
@@ -72,6 +73,38 @@ object GemmaParser {
             List(jsonArray.length()) { i -> jsonArray.getString(i) }
         } catch (e: Exception) {
             Log.e("GemmaParser", "Failed to parse tags: ${e.message}")
+            null
+        }
+    }
+
+    fun parseUserSignatureJson(raw: String?): UserEntity? {
+        if (raw.isNullOrBlank()) return null
+
+        return try {
+            val cleanJson = raw
+                .replace("```json", "")
+                .replace("```", "")
+                .trim()
+
+            val json = JSONObject(cleanJson)
+
+            UserEntity(
+                id = 0, // Set appropriately if updating existing user
+                name = "", // Fill later
+                about = "", // Fill later
+                visualMoodColour = json.optString("visualMoodColour", null),
+                moodSensitivityLevel = json.optInt("moodSensitivityLevel", -1).takeIf { it >= 0 },
+                thinkingStyle = json.optString("thinkingStyle", null),
+                learningStyle = json.optString("learningStyle", null),
+                writingStyle = json.optString("writingStyle", null),
+                emotionalStrength = json.optString("emotionalStrength", null),
+                emotionalWeakness = json.optString("emotionalWeakness", null),
+                emotionalSignature = json.optJSONArray("emotionalSignature")?.let { array ->
+                    (0 until array.length()).joinToString(",") { i -> array.getString(i) }
+                }
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }

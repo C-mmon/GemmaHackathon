@@ -41,7 +41,7 @@ class GemmaClient(private val context: Context)
     //Updating to return null
     suspend fun analyzeText(entryText: String): String? {
         val prompt = """
-            Analyze the following diary entry, if the diary entry is short, return NULL,and return a JSON with:
+            Analyze the following diary entry, if the diary entry is short, return NULL,or return a JSON with:
             - mood, moodConfidence, summary, reflectionQuestions, writingStyle, emotionDistribution, stressLevel, tone
             Entry:
             "$entryText"
@@ -57,6 +57,19 @@ class GemmaClient(private val context: Context)
             Analyze the following diary entry and return a JSON with only 3 tags entries that are appropriate for the give:
             - tags
             Entry:
+            "$entryText"
+        """.trimIndent()
+
+        return withContext(Dispatchers.Default) {
+            llm?.generateResponse(prompt)
+        }
+    }
+
+
+    suspend fun generateUserEmotionalSignature(entryText: String): String? {
+        val prompt = """
+            Analyze the following diary entry and return a JSON with:
+            - visualMoodColour, moodSensitivityLevel, thinkingStyle, learningStyle, writingStyle, emotionalStrength, emotionalWeakness, emotionalSignature
             "$entryText"
         """.trimIndent()
 
