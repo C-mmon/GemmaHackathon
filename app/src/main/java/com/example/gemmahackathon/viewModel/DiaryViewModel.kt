@@ -132,6 +132,27 @@ class DiaryViewModel(
     //Thumb of rule, when updating MutableStateFlow, always update like this
     // __stateFlow = newValue
 
+    suspend fun searchThroughMemories(text: String) : String
+    {
+        val rawTags = gemmaClient.generateDiaryEntryTags(text)
+        //LLM will generate 3 tags, we need to return one entry from these 3 tags
+        val parsedTags = GemmaParser.parseTagsArray(rawTags)
+        Log.d("DiaryViewModel", "Parsed tags: $parsedTags")
+
+        val allMatches = mutableSetOf<DiaryEntry>()
+        if (parsedTags != null) {
+            for (tag in parsedTags) {
+                Log.d("DiaryViewModel", "Searching for tag: $tag")
+                allMatches.addAll(diaryDao.searchEntryUsingTag(tag))
+            }
+        }
+
+        //we need to pick entries which are closet by the time stamp
+        val bestMatch = allMatches.maxByOrNull { it.createdAt } // return a random entry or just NULL
+
+        return bestMatch?.text ?: "No relevant memory found."
+    }
+
     fun loadMood(entryId: Long) {
         viewModelScope.launch(dispatchers.io) {
             try {

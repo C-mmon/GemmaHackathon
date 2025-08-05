@@ -30,6 +30,14 @@ interface DiaryDao {
     @Query("DELETE FROM tags WHERE entryId = :entryId")
     suspend fun deleteTagsForEntry(entryId: Long)
 
+    @Query
+        ("""
+            SELECT * FROM entries  
+            WHERE id IN (
+            SELECT entryId FROM tags WHERE name LIKE '%' || :tag || '%')
+        """)
+    suspend fun searchEntryUsingTag(tag: String): List<DiaryEntry>
+
     // DiaryWithTags relation queries
     @Transaction
     @Query("SELECT * FROM entries WHERE id = :id")

@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -72,6 +73,57 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(vertical = 8.dp)
             )
+
+            // Search Your Memories Section
+            DiaryCard {
+                SectionHeader("Search Your Memories")
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                var searchText by rememberSaveable { mutableStateOf("") }
+                var searchResult by rememberSaveable { mutableStateOf("No relevant memory found.") }
+                var isLoading by remember { mutableStateOf(false) }
+                val scope = rememberCoroutineScope()
+                
+                OutlinedTextField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    label = { Text("Enter a keyword...") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    textStyle = TextStyle(Color(0xFF64B5F6))
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Button(
+                    onClick = {
+                        isLoading = true
+                        searchResult = "" // Clear the previous result
+                        scope.launch {
+                            searchResult = diaryViewModel.searchThroughMemories(searchText)
+                            isLoading = false
+                        }
+                    },
+                    modifier = Modifier.align(Alignment.End)
+                ) {
+                    Text("Search")
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                } else {
+                    Text(
+                        text = searchResult,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF64B5F6),
+                        lineHeight = 20.sp
+                    )
+                }
+            }
 
             // Reflection Questions Section
             DiaryCard {

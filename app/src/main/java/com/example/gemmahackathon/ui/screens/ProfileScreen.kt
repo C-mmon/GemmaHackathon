@@ -54,7 +54,7 @@ fun ProfileScreen(
                 text = "Profile",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = Color(0xFF8A2BE2), // Purple color for text
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             
@@ -92,7 +92,7 @@ fun ProfileScreen(
                         text = user?.name ?: "Dear Diary User",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = Color(0xFF8A2BE2) // Purple color for text
                     )
                     
                     Spacer(modifier = Modifier.height(8.dp))
@@ -101,7 +101,7 @@ fun ProfileScreen(
                     Text(
                         text = user?.about ?: "Welcome to your diary journey",
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                        color = Color(0xFF8A2BE2).copy(alpha = 0.7f) // Purple color for text
                     )
                     
                     Spacer(modifier = Modifier.height(16.dp))
@@ -134,7 +134,7 @@ fun ProfileScreen(
                                     text = "Mood:",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = Color(0xFF8A2BE2) // Purple color for text
                                 )
                                 MoodChip(mood = mood)
                             }
@@ -150,12 +150,12 @@ fun ProfileScreen(
                                     text = "Tone:",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = Color(0xFF8A2BE2) // Purple color for text
                                 )
                                 Text(
                                     text = tone!!,
                                     fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                    color = Color(0xFF8A2BE2).copy(alpha = 0.8f) // Purple color for text
                                 )
                             }
                         }
@@ -170,12 +170,12 @@ fun ProfileScreen(
                                     text = "Writing Style:",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = Color(0xFF8A2BE2) // Purple color for text
                                 )
                                 Text(
                                     text = writingStyle!!,
                                     fontSize = 14.sp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                    color = Color(0xFF8A2BE2).copy(alpha = 0.8f) // Purple color for text
                                 )
                             }
                         }
@@ -184,7 +184,7 @@ fun ProfileScreen(
                     Text(
                         text = "Write an entry to see your mood analysis",
                         fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        color = Color(0xFF8A2BE2).copy(alpha = 0.6f) // Purple color for text
                     )
                 }
             }
@@ -223,7 +223,7 @@ fun ProfileScreen(
                         Text(
                             text = "Your characteristics will appear here as you write more entries",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = Color(0xFF8A2BE2).copy(alpha = 0.6f) // Purple color for text
                         )
                     }
                 }
@@ -267,7 +267,7 @@ fun ProfileScreen(
                     Text(
                         text = signature,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = Color(0xFF8A2BE2), // Purple color for text
                         lineHeight = 20.sp
                     )
                 }
@@ -290,13 +290,13 @@ private fun CharacteristicRow(
             text = "$label:",
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface,
+            color = Color(0xFF8A2BE2), // Purple color for text
             modifier = Modifier.weight(1f)
         )
         Text(
             text = value,
             fontSize = 14.sp,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+            color = Color(0xFF8A2BE2).copy(alpha = 0.8f), // Purple color for text
             modifier = Modifier.weight(1f)
         )
     }

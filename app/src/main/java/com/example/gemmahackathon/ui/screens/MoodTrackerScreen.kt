@@ -68,7 +68,7 @@ fun MoodTrackerScreen(
                 text = "Mood Tracker",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = Color(0xFF8A2BE2), // Purple color for text
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             
@@ -88,13 +88,13 @@ fun MoodTrackerScreen(
                             text = "No mood data yet",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = Color(0xFF8A2BE2) // Purple color for text
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Write diary entries to track your mood over time",
                             fontSize = 14.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            color = Color(0xFF8A2BE2).copy(alpha = 0.7f) // Purple color for text
                         )
                     }
                 }
@@ -114,7 +114,7 @@ fun MoodTrackerScreen(
                             Text(
                                 text = "Latest Mood",
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                color = Color(0xFF8A2BE2) // Purple color for text
                             )
                         }
                         
@@ -128,7 +128,7 @@ fun MoodTrackerScreen(
                             Text(
                                 text = "Confidence",
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                color = Color(0xFF8A2BE2) // Purple color for text
                             )
                         }
                         
@@ -146,7 +146,7 @@ fun MoodTrackerScreen(
                             Text(
                                 text = "Stress Level",
                                 fontSize = 12.sp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                color = Color(0xFF8A2BE2) // Purple color for text
                             )
                         }
                     }
@@ -203,17 +203,17 @@ fun MoodTrackerScreen(
                         Text(
                             text = "• Average stress level: ${String.format("%.1f", avgStress)}/10",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = Color(0xFF8A2BE2) // Purple color for text
                         )
                         Text(
                             text = "• Average confidence: ${String.format("%.0f", avgConfidence * 100)}%",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = Color(0xFF8A2BE2) // Purple color for text
                         )
                         Text(
                             text = "• You've tracked ${moodData.size} mood${if (moodData.size != 1) "s" else ""} so far",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = Color(0xFF8A2BE2) // Purple color for text
                         )
                     }
                 }

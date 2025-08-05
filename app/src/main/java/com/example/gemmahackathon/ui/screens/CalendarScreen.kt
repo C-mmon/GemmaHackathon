@@ -67,7 +67,7 @@ fun CalendarScreen(
                 text = "Calendar",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = Color(0xFF8A2BE2).copy(alpha = 0.7f), // Purple color for text
                 modifier = Modifier.padding(vertical = 8.dp)
             )
             
@@ -78,7 +78,7 @@ fun CalendarScreen(
                     text = SimpleDateFormat("MMMM yyyy", Locale.getDefault()).format(firstDayOfMonth),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = Color(0xFF8A2BE2).copy(alpha = 0.7f), // Purple color for text, // Purple color for text
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
                 
@@ -92,7 +92,7 @@ fun CalendarScreen(
                             text = day,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            color = Color(0xFF8A2BE2).copy(alpha = 0.7f), // Purple color for text
                             textAlign = TextAlign.Center,
                             modifier = Modifier.weight(1f)
                         )
@@ -146,7 +146,7 @@ fun CalendarScreen(
                                 color = when {
                                     isToday -> Color.White
                                     hasEntry -> Color.White
-                                    else -> MaterialTheme.colorScheme.onSurface
+                                    else -> Color(0xFF8A2BE2) // Purple color for text
                                 },
                                 textAlign = TextAlign.Center
                             )
@@ -172,7 +172,7 @@ fun CalendarScreen(
                         Text(
                             "Today",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = Color(0xFF8A2BE2) // Purple color for text
                         )
                     }
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -186,7 +186,7 @@ fun CalendarScreen(
                         Text(
                             "Has Entry",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = Color(0xFF8A2BE2) // Purple color for text
                         )
                     }
                 }
@@ -202,14 +202,14 @@ fun CalendarScreen(
                     text = "🔥 $streak day${if (streak != 1) "s" else ""} streak!",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = Color(0xFF8A2BE2).copy(alpha = 0.7f) // Purple color for text
                 )
                 
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Keep it up! Consistency is key to meaningful reflection.",
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = Color(0xFF8A2BE2).copy(alpha = 0.7f) // Purple color for text
                 )
             }
             
@@ -222,10 +222,10 @@ fun CalendarScreen(
                     Text(
                         text = entry.diaryEntry.text,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        color = Color(0xFF8A2BE2) ,// Purple color for text,
                         lineHeight = 20.sp
                     )
-                    
+
                     if (entry.tags.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Row(
