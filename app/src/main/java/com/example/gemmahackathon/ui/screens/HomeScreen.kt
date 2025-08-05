@@ -18,6 +18,11 @@ import com.example.gemmahackathon.ui.components.*
 import com.example.gemmahackathon.viewModel.DiaryViewModel
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +40,7 @@ fun HomeScreen(
     var lastCreatedEntryId by remember { mutableStateOf<Long?>(null) }
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
-    
+
     // Handle one-shot events
     LaunchedEffect(events) {
         events?.let { event ->
@@ -46,7 +51,7 @@ fun HomeScreen(
             }
         }
     }
-    
+
     // Load summary when a new entry is created
     LaunchedEffect(uiState.entries.size) {
         val latestEntry = uiState.entries.firstOrNull()
@@ -58,199 +63,210 @@ fun HomeScreen(
     }
 
     GradientBackground {
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
-                .verticalScroll(scrollState),
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // App Title
-            Text(
-                text = "Dear Diary",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+            item {
+                Text(
+                    text = "Dear Diary",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
 
             // Search Your Memories Section
-            DiaryCard {
-                SectionHeader("Search Your Memories")
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                var searchText by rememberSaveable { mutableStateOf("") }
-                var searchResult by rememberSaveable { mutableStateOf("No relevant memory found.") }
-                var isLoading by remember { mutableStateOf(false) }
-                val scope = rememberCoroutineScope()
-                
-                OutlinedTextField(
-                    value = searchText,
-                    onValueChange = { searchText = it },
-                    label = { Text("Enter a keyword...") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    textStyle = TextStyle(Color(0xFF64B5F6))
-                )
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Button(
-                    onClick = {
-                        isLoading = true
-                        searchResult = "" // Clear the previous result
-                        scope.launch {
-                            searchResult = diaryViewModel.searchThroughMemories(searchText)
-                            isLoading = false
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text("Search")
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+            item {
+                DiaryCard {
+                    SectionHeader("Search Your Memories")
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    var searchText by rememberSaveable { mutableStateOf("") }
+                    var searchResult by rememberSaveable { mutableStateOf("No relevant memory found.") }
+                    var isLoading by remember { mutableStateOf(false) }
+
+                    OutlinedTextField(
+                        value = searchText,
+                        onValueChange = { searchText = it },
+                        label = { Text("Enter a keyword...") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        textStyle = TextStyle(Color(0xFF64B5F6))
                     )
-                } else {
-                    Text(
-                        text = searchResult,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF64B5F6),
-                        lineHeight = 20.sp
-                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = {
+                            isLoading = true
+                            searchResult = "" // Clear the previous result
+                            scope.launch {
+                                searchResult = diaryViewModel.searchThroughMemories(searchText)
+                                isLoading = false
+                            }
+                        },
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text("Search")
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    } else {
+                        Text(
+                            text = searchResult,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF64B5F6),
+                            lineHeight = 20.sp
+                        )
+                    }
                 }
             }
 
             // Reflection Questions Section
-            DiaryCard {
-                SectionHeader("Today's Reflection")
-                Spacer(modifier = Modifier.height(8.dp))
-                val reflectionColor = Color(0xFF64B5F6) // This is the color of the reflection question
-                if (!reflectionQuestions.isNullOrBlank()) {
-                    Column {
-                        reflectionQuestions!!.split(",").forEach { question ->
-                            Text(
-                                text = "• ${question.trim()}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = reflectionColor,
-                                lineHeight = 20.sp
-                            )
+            item {
+                DiaryCard {
+                    SectionHeader("Today's Reflection")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    val reflectionColor = Color(0xFF64B5F6) // This is the color of the reflection question
+                    if (!reflectionQuestions.isNullOrBlank()) {
+                        Column {
+                            reflectionQuestions!!.split(",").forEach { question ->
+                                Text(
+                                    text = "• ${question.trim()}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = reflectionColor,
+                                    lineHeight = 20.sp
+                                )
+                            }
                         }
                     }
                 }
-
             }
 
             // Diary Entry Input Section
-            DiaryCard {
-                SectionHeader("Write Your Entry")
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                OutlinedTextField(
-                    value = diaryText,
-                    onValueChange = { diaryText = it },
-                    label = { Text("Share your thoughts...") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp),
-                    minLines = 4,
-                    maxLines = 6,
-                    enabled = !uiState.isLoading,
-                    textStyle = TextStyle(color = Color(0xFF64B5F6))
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                Button(
-                    onClick = {
-                        if (diaryText.isNotBlank()) {
-                            scope.launch {
+            item {
+                DiaryCard {
+                    SectionHeader("Write Your Entry")
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                                //There is some race condition, cannot figure out why
-                                val textShow = diaryText
-                                diaryText=""
-                                diaryViewModel.createEntry(textShow)
+                    OutlinedTextField(
+                        value = diaryText,
+                        onValueChange = { diaryText = it },
+                        label = { Text("Share your thoughts...") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
+                        minLines = 4,
+                        maxLines = 6,
+                        enabled = !uiState.isLoading,
+                        textStyle = TextStyle(color = Color(0xFF64B5F6))
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = {
+                            if (diaryText.isNotBlank()) {
+                                scope.launch {
+                                    val textShow = diaryText
+                                    diaryText = ""
+                                    diaryViewModel.createEntry(textShow)
+                                }
                             }
+                        },
+                        modifier = Modifier.align(Alignment.End),
+                        enabled = diaryText.isNotBlank() && !uiState.isLoading
+                    ) {
+                        if (uiState.isLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Creating...")
+                        } else {
+                            Icon(Icons.Default.Send, contentDescription = "Send")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Create Entry")
                         }
-                    },
-                    modifier = Modifier.align(Alignment.End),
-                    enabled = diaryText.isNotBlank() && !uiState.isLoading
-                ) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Creating...")
-                    } else {
-                        Icon(Icons.Default.Send, contentDescription = "Send")
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Create Entry")
                     }
                 }
             }
 
             // Recent Entry Summary
             if (summary != null && !uiState.isLoading) {
-                DiaryCard {
-                    SectionHeader("Entry Summary")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = summary!!,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF64B5F6),
-                        lineHeight = 18.sp
-                    )
+                item {
+                    DiaryCard {
+                        SectionHeader("Entry Summary")
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = summary!!,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF64B5F6),
+                            lineHeight = 18.sp
+                        )
+                    }
                 }
             }
 
             // Recent Entries Preview
             if (uiState.entries.isNotEmpty()) {
-                DiaryCard {
-                    SectionHeader("Recent Entries")
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    uiState.entries.take(3).forEach { entryWithTags ->
+                item {
+                    DiaryCard {
                         Column(
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = entryWithTags.diaryEntry.text,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFF64B5F6),
-                                maxLines = 2
-                            )
-                            
-                            if (entryWithTags.tags.isNotEmpty()) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    entryWithTags.tags.take(3).forEach { tag ->
-                                        TagChip(tag = tag.name)
-                                    }
-                                    if (entryWithTags.tags.size > 3) {
-                                        Text(
-                                            text = "+${entryWithTags.tags.size - 3}",
-                                            fontSize = 10.sp,
-                                            color = Color(0xFF64B5F6)
-                                        )
-                                    }
-                                }
-                            }
-                            
-                            if (entryWithTags != uiState.entries.take(3).last()) {
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        )
+                            {
+                                SectionHeader("Recent Entries")
                                 Spacer(modifier = Modifier.height(8.dp))
-                                HorizontalDivider(
-                                    color = Color(0xFF64B5F6)
-                                )
+
+
+                            // List all entries
+                            uiState.entries.forEach { entryWithTags ->
+                                Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                                    Text(
+                                        text = entryWithTags.diaryEntry.text,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color =  Color(0xFF8A2BE2),
+                                        maxLines = 2
+                                    )
+
+                                    Text(
+                                        text = "Created on: " + SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(Date(entryWithTags.diaryEntry.createdAt)),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color =  Color(0xFF8A2BE2)
+
+                                    )
+
+                                    if (entryWithTags.tags.isNotEmpty()) {
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        ) {
+                                            entryWithTags.tags.forEach { tag ->
+                                                TagChip(tag = tag.name)
+                                            }
+                                        }
+                                    }
+
+                                    HorizontalDivider(
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                                    )
+                                }
+
                             }
                         }
                     }
