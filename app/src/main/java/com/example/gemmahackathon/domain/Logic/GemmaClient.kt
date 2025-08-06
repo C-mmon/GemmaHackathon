@@ -84,9 +84,22 @@ class GemmaClient(private val context: Context)
 
     suspend fun generateUserEmotionalSignature(entryText: String): String? {
         val prompt = """
-            Analyze the following diary entry and return a JSON with:
-            - visualMoodColour, moodSensitivityLevel, thinkingStyle, learningStyle, writingStyle, emotionalStrength, emotionalWeakness, emotionalSignature
-            "$entryText"
+            Analyze the following diary entry and return a JSON with the user's personality characteristics:
+
+            {
+                "visualMoodColour": "#RRGGBB hex color representing the user's emotional state",
+                "moodSensitivityLevel": number from 1-10 indicating emotional sensitivity,
+                "thinkingStyle": "brief description of how the user processes thoughts",
+                "learningStyle": "brief description of how the user learns and processes information",
+                "writingStyle": "brief description of the user's writing patterns and style",
+                "emotionalStrength": "brief description of the user's emotional strengths",
+                "emotionalWeakness": "brief description of areas where the user could improve emotionally",
+                "emotionalSignature": "comprehensive description of the user's overall emotional profile"
+            }
+
+            Diary entry: "$entryText"
+
+            Return only valid JSON with all fields filled. Use null for any field you cannot determine.
         """.trimIndent()
 
         return withContext(Dispatchers.Default) {

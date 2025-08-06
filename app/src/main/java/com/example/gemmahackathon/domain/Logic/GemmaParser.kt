@@ -109,29 +109,83 @@ object GemmaParser {
         if (raw.isNullOrBlank()) return null
 
         return try {
-            val cleanJson = raw
-                .replace("```json", "")
-                .replace("```", "")
-                .trim()
+            Log.d("GemmaParser", "Original raw response:")
+            Log.d("GemmaParser", raw)
+            
+            // Extract JSON from the response more carefully
+            val jsonStart = raw.indexOf("{")
+            val jsonEnd = raw.lastIndexOf("}") + 1
+            
+            if (jsonStart == -1 || jsonEnd == 0 || jsonStart >= jsonEnd) {
+                Log.e("GemmaParser", "Could not find valid JSON boundaries")
+                return null
+            }
+            
+            var cleanJson = raw.substring(jsonStart, jsonEnd)
+            
+            Log.d("GemmaParser", "Extracted JSON substring:")
+            Log.d("GemmaParser", cleanJson)
+            
+            // Remove any potential BOM or invisible characters
+            cleanJson = cleanJson.replace("\uFEFF", "") // BOM
+            cleanJson = cleanJson.replace("\u200B", "") // Zero-width space
+            cleanJson = cleanJson.replace("\u00A0", " ") // Non-breaking space
+            
+            Log.d("GemmaParser", "Final cleaned JSON:")
+            Log.d("GemmaParser", cleanJson)
 
             val json = JSONObject(cleanJson)
 
-            UserEntity(
+            // Helper function to get string or null (handles empty strings and "null" strings)
+            fun getStringOrNull(key: String): String? {
+                return if (json.has(key)) {
+                    val value = json.getString(key)
+                    if (value.isBlank() || value == "null") null else value
+                } else null
+            }
+
+            // Helper function to get int or null
+            fun getIntOrNull(key: String): Int? {
+                return if (json.has(key)) {
+                    val value = json.get(key)
+                    when (value) {
+                        is Int -> value
+                        is String -> value.toIntOrNull()
+                        else -> null
+                    }
+                } else null
+            }
+
+            val userEntity = UserEntity(
                 id = 0, // Set appropriately if updating existing user
                 name = "", // Fill later
                 about = "", // Fill later
-                visualMoodColour = json.optString("visualMoodColour", null),
-                moodSensitivityLevel = json.optInt("moodSensitivityLevel", -1).takeIf { it >= 0 },
-                thinkingStyle = json.optString("thinkingStyle", null),
-                learningStyle = json.optString("learningStyle", null),
-                writingStyle = json.optString("writingStyle", null),
-                emotionalStrength = json.optString("emotionalStrength", null),
-                emotionalWeakness = json.optString("emotionalWeakness", null),
-                emotionalSignature = json.optJSONArray("emotionalSignature")?.let { array ->
-                    (0 until array.length()).joinToString(",") { i -> array.getString(i) }
+                visualMoodColour = getStringOrNull("visualMoodColour"),
+                moodSensitivityLevel = getIntOrNull("moodSensitivityLevel"),
+                thinkingStyle = getStringOrNull("thinkingStyle"),
+                learningStyle = getStringOrNull("learningStyle"),
+                writingStyle = getStringOrNull("writingStyle"),
+                emotionalStrength = getStringOrNull("emotionalStrength"),
+                emotionalWeakness = getStringOrNull("emotionalWeakness"),
+                emotionalSignature = when {
+                    json.has("emotionalSignature") -> {
+                        val sigValue = json.get("emotionalSignature")
+                        when (sigValue) {
+                            is org.json.JSONArray -> (0 until sigValue.length()).joinToString(", ") { i -> sigValue.getString(i) }
+                            is String -> if (sigValue.isBlank() || sigValue == "null") null else sigValue
+                            else -> sigValue.toString()
+                        }
+                    }
+                    else -> null
                 }
             )
+            
+            Log.d("GemmaParser", "Parsed UserEntity: $userEntity")
+            userEntity
+            
         } catch (e: Exception) {
+            Log.e("GemmaParser", "Failed to parse user signature JSON: ${e.message}")
+            Log.e("GemmaParser", "Raw response: $raw")
             e.printStackTrace()
             null
         }

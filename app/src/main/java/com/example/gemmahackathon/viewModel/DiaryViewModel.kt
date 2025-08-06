@@ -316,46 +316,66 @@ class DiaryViewModel(
      */
     private suspend fun updateUserProfileFromSignature(signature: UserEntity) {
         try {
+            Log.d("DiaryViewModel", "Starting user profile update with signature: $signature")
+            
             // Update each field individually if it's not null
-            signature.visualMoodColour?.let { color ->
-                userViewModel.updateMoodColor(color)
-                Log.d("DiaryViewModel", "Updated mood color: $color")
+            if (signature.visualMoodColour != null) {
+                userViewModel.updateMoodColor(signature.visualMoodColour)
+                Log.d("DiaryViewModel", "Updated mood color: ${signature.visualMoodColour}")
+            } else {
+                Log.d("DiaryViewModel", "Mood color is null, skipping update")
             }
 
-            signature.moodSensitivityLevel?.let { level ->
-                userViewModel.updateMoodSensitivityLevel(level)
-                Log.d("DiaryViewModel", "Updated mood sensitivity level: $level")
+            if (signature.moodSensitivityLevel != null) {
+                userViewModel.updateMoodSensitivityLevel(signature.moodSensitivityLevel)
+                Log.d("DiaryViewModel", "Updated mood sensitivity level: ${signature.moodSensitivityLevel}")
+            } else {
+                Log.d("DiaryViewModel", "Mood sensitivity level is null, skipping update")
             }
 
-            signature.thinkingStyle?.let { style ->
-                userViewModel.updateThinkingStyle(style)
-                Log.d("DiaryViewModel", "Updated thinking style: $style")
+            if (signature.thinkingStyle != null) {
+                userViewModel.updateThinkingStyle(signature.thinkingStyle)
+                Log.d("DiaryViewModel", "Updated thinking style: ${signature.thinkingStyle}")
+            } else {
+                Log.d("DiaryViewModel", "Thinking style is null, skipping update")
             }
 
-            signature.learningStyle?.let { style ->
-                userViewModel.updateLearningStyle(style)
-                Log.d("DiaryViewModel", "Updated learning style: $style")
+            if (signature.learningStyle != null) {
+                userViewModel.updateLearningStyle(signature.learningStyle)
+                Log.d("DiaryViewModel", "Updated learning style: ${signature.learningStyle}")
+            } else {
+                Log.d("DiaryViewModel", "Learning style is null, skipping update")
             }
 
-            signature.writingStyle?.let { style ->
-                userViewModel.updateWritingStyle(style)
-                Log.d("DiaryViewModel", "Updated writing style: $style")
+            if (signature.writingStyle != null) {
+                userViewModel.updateWritingStyle(signature.writingStyle)
+                Log.d("DiaryViewModel", "Updated writing style: ${signature.writingStyle}")
+            } else {
+                Log.d("DiaryViewModel", "Writing style is null, skipping update")
             }
 
-            signature.emotionalStrength?.let { strength ->
-                userViewModel.updateEmotionalStrength(strength)
-                Log.d("DiaryViewModel", "Updated emotional strength: $strength")
+            if (signature.emotionalStrength != null) {
+                userViewModel.updateEmotionalStrength(signature.emotionalStrength)
+                Log.d("DiaryViewModel", "Updated emotional strength: ${signature.emotionalStrength}")
+            } else {
+                Log.d("DiaryViewModel", "Emotional strength is null, skipping update")
             }
 
-            signature.emotionalWeakness?.let { weakness ->
-                userViewModel.updateEmotionalWeakness(weakness)
-                Log.d("DiaryViewModel", "Updated emotional weakness: $weakness")
+            if (signature.emotionalWeakness != null) {
+                userViewModel.updateEmotionalWeakness(signature.emotionalWeakness)
+                Log.d("DiaryViewModel", "Updated emotional weakness: ${signature.emotionalWeakness}")
+            } else {
+                Log.d("DiaryViewModel", "Emotional weakness is null, skipping update")
             }
 
-            signature.emotionalSignature?.let { emotionalSig ->
-                userViewModel.updateEmotionalSignature(emotionalSig)
-                Log.d("DiaryViewModel", "Updated emotional signature: $emotionalSig")
+            if (signature.emotionalSignature != null) {
+                userViewModel.updateEmotionalSignature(signature.emotionalSignature)
+                Log.d("DiaryViewModel", "Updated emotional signature: ${signature.emotionalSignature}")
+            } else {
+                Log.d("DiaryViewModel", "Emotional signature is null, skipping update")
             }
+
+            Log.d("DiaryViewModel", "Completed user profile update")
 
         } catch (e: Exception) {
             Log.e("DiaryViewModel", "Failed to update user profile from signature: ${e.message}", e)
