@@ -107,12 +107,12 @@ class DiaryViewModel(
 
     //just for awarness and repeating to myself, suspend allows to perform a long running operation
     // without blocking the current thread
-    suspend fun createEntry(text: String) {
+    fun createEntry(text: String) {
         viewModelScope.launch(dispatchers.io) {
             //Change a mutable state variable isLoading to true
             setLoading(true)
-        }
-        runCatching {
+            
+            runCatching {
             /* 1. Insert entry */
             Log.d("DiaryViewModel", "Inserting diary entry: $text")
             val entryId = diaryDao.insert(DiaryEntry(text = text, isDeleted = false))
@@ -144,13 +144,14 @@ class DiaryViewModel(
                 dvmId // Return the entry ID
             }
             
-            // Asynchronously generate and update user emotional signature
-            // This runs in the background and doesn't block the UI
-            generateUserEmotionalSignatureAsync(text, finalEntryId)
-        }.onFailure { throwable ->
-            _events.emit(DiaryUiEvent.ShowError(throwable.message ?: "Unknown error"))
+                // Asynchronously generate and update user emotional signature
+                // This runs in the background and doesn't block the UI
+                generateUserEmotionalSignatureAsync(text, finalEntryId)
+            }.onFailure { throwable ->
+                _events.emit(DiaryUiEvent.ShowError(throwable.message ?: "Unknown error"))
+            }
+            setLoading(false)
         }
-        setLoading(false)
     }
 
     //Thumb of rule, when updating MutableStateFlow, always update like this
