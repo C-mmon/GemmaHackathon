@@ -22,6 +22,7 @@ class UserViewModel @Inject constructor(
         }
     }
 
+
     fun updateMoodColor(colorHex: String) {
         viewModelScope.launch {
             _user.value?.let {
@@ -118,6 +119,29 @@ class UserViewModel @Inject constructor(
                 val updated = it.copy(emotionalSignature = signature)
                 userDao.update(updated)
                 _user.value = updated
+            }
+        }
+    }
+
+    fun createFirstTimeUser() {
+        viewModelScope.launch {
+            val existingUser = _user.value
+            if (existingUser == null) {
+                val newUser = UserEntity(
+                    id = 0,
+                    name = "Aniket Kumar",
+                    about = "Welcome to your mood tracking journey!",
+                    visualMoodColour = "#8B5CF6", // Default purple color
+                    moodSensitivityLevel = 5,
+                    thinkingStyle = null,
+                    learningStyle = null,
+                    writingStyle = null,
+                    emotionalStrength = null,
+                    emotionalWeakness = null,
+                    emotionalSignature = null
+                )
+                userDao.insert(newUser)
+                _user.value = newUser
             }
         }
     }

@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import android.util.Log
 import com.example.gemmahackathon.data.DiaryDatabase
 import androidx.room.withTransaction
-
+import com.example.gemmahackathon.data.user.UserEntity
 
 /* ---------- Dispatcher abstraction for testability ---------- */
 interface DispatcherProvider {
@@ -99,6 +99,10 @@ class DiaryViewModel(
 
     init {
         observeEntries()
+        // Initialize first-time user if needed
+        viewModelScope.launch {
+            userViewModel.createFirstTimeUser()
+        }
     }
 
     //just for awarness and repeating to myself, suspend allows to perform a long running operation
@@ -131,15 +135,18 @@ class DiaryViewModel(
             // val rawTags = gemmaClient.generateDiaryEntryTags(text) <-  avoid calling this now
 
             //We want the database entry to be one atomic operation
-            database.withTransaction {
+            val finalEntryId = database.withTransaction {
                 val dvmId = diaryDao.insert(DiaryEntry(text = text, isDeleted = false))
                 parsed?.analysis?.let { diaryDao.insertAnalysis(it.copy(entryId = dvmId)) }
                 parsed?.tags?.forEach { tag ->
                     diaryDao.insertTag(Tag(entryId = dvmId, name = tag))
                 }
+                dvmId // Return the entry ID
             }
-            //For now, we want to allow each entry update existing user profile.
-            //But in future support, we want to
+            
+            // Asynchronously generate and update user emotional signature
+            // This runs in the background and doesn't block the UI
+            generateUserEmotionalSignatureAsync(text, finalEntryId)
         }.onFailure { throwable ->
             _events.emit(DiaryUiEvent.ShowError(throwable.message ?: "Unknown error"))
         }
@@ -275,6 +282,84 @@ class DiaryViewModel(
     }
 
 
-    //We need
+    /**
+     * Asynchronously generates and updates user emotional signature
+     * This doesn't block the main UI thread and runs in the background
+     */
+    private fun generateUserEmotionalSignatureAsync(entryText: String, entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                Log.d("DiaryViewModel", "Starting async user emotional signature generation for entry: $entryId")
+
+                // Generate emotional signature using LLM
+                val rawSignature = gemmaClient.generateUserEmotionalSignature(entryText)
+                Log.d("DiaryViewModel", "Raw emotional signature response: $rawSignature")
+
+                // Parse the response
+                val parsedSignature = GemmaParser.parseUserSignatureJson(rawSignature)
+                Log.d("DiaryViewModel", "Parsed emotional signature: $parsedSignature")
+
+                // Update user profile if parsing was successful
+                parsedSignature?.let { signature ->
+                    updateUserProfileFromSignature(signature)
+                }
+
+            } catch (e: Exception) {
+                Log.e("DiaryViewModel", "Failed to generate user emotional signature: ${e.message}", e)
+                // Don't emit error to UI since this is background operation
+            }
+        }
+    }
+
+    /**
+     * Updates user profile fields based on the parsed emotional signature
+     */
+    private suspend fun updateUserProfileFromSignature(signature: UserEntity) {
+        try {
+            // Update each field individually if it's not null
+            signature.visualMoodColour?.let { color ->
+                userViewModel.updateMoodColor(color)
+                Log.d("DiaryViewModel", "Updated mood color: $color")
+            }
+
+            signature.moodSensitivityLevel?.let { level ->
+                userViewModel.updateMoodSensitivityLevel(level)
+                Log.d("DiaryViewModel", "Updated mood sensitivity level: $level")
+            }
+
+            signature.thinkingStyle?.let { style ->
+                userViewModel.updateThinkingStyle(style)
+                Log.d("DiaryViewModel", "Updated thinking style: $style")
+            }
+
+            signature.learningStyle?.let { style ->
+                userViewModel.updateLearningStyle(style)
+                Log.d("DiaryViewModel", "Updated learning style: $style")
+            }
+
+            signature.writingStyle?.let { style ->
+                userViewModel.updateWritingStyle(style)
+                Log.d("DiaryViewModel", "Updated writing style: $style")
+            }
+
+            signature.emotionalStrength?.let { strength ->
+                userViewModel.updateEmotionalStrength(strength)
+                Log.d("DiaryViewModel", "Updated emotional strength: $strength")
+            }
+
+            signature.emotionalWeakness?.let { weakness ->
+                userViewModel.updateEmotionalWeakness(weakness)
+                Log.d("DiaryViewModel", "Updated emotional weakness: $weakness")
+            }
+
+            signature.emotionalSignature?.let { emotionalSig ->
+                userViewModel.updateEmotionalSignature(emotionalSig)
+                Log.d("DiaryViewModel", "Updated emotional signature: $emotionalSig")
+            }
+
+        } catch (e: Exception) {
+            Log.e("DiaryViewModel", "Failed to update user profile from signature: ${e.message}", e)
+        }
+    }
 }
 
