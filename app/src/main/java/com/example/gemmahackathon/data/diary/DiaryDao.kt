@@ -99,6 +99,9 @@ interface DiaryDao {
     @Query("SELECT tone FROM DiaryAnalysis WHERE entryId = :entryId")
     suspend fun getTone(entryId: Long): String?
 
+    @Query("SELECT selfhelp FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getSelfhelp(entryId: Long): String?
+
     //Delete functionality
     @Query("DELETE FROM entries")
     suspend fun clearAllEntries()

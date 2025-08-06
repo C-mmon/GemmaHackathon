@@ -29,7 +29,8 @@ data class DiaryAnalysis(
     val writingStyle: String? = null,
     val emotionDistribution: String? = null, // JSON string: {"Joy":0.6,"Anger":0.1}
     val stressLevel: Int? = null,
-    val tone: String? = null
+    val tone: String? = null,
+    val selfhelp: String? = null
 
     //Future: Allow to store image and voice notes as part of the entry
     // Since gemma 3n does not support inference based on direct voice and image, this will be something left for the future to think of

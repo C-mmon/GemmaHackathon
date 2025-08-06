@@ -13,7 +13,7 @@ import com.example.gemmahackathon.data.user.UserEntity
 
 //class will have one table Diary Entry
 //version numbers helps for the migration strategy
-@Database(entities = [DiaryEntry::class, Tag::class, DiaryAnalysis::class, UserEntity::class], version = 3)
+@Database(entities = [DiaryEntry::class, Tag::class, DiaryAnalysis::class, UserEntity::class], version = 4)
 //annotation marks the class as a room data ase
 //abstract class that extends Room Database
 abstract class DiaryDatabase : RoomDatabase() {

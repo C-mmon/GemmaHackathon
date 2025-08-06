@@ -17,7 +17,7 @@ class GemmaClient(private val context: Context)
     {
         private const val TAG ="GemmaClient"
         private const val MODEL_FILENAME = "gemma-3n-E2B-it-int4.task"
-        const val DEFAULT_MAX_TOKENS = 200
+        const val DEFAULT_MAX_TOKENS = 1000
         const val DEFAULT_TOP_K = 0
 
     }
@@ -45,11 +45,21 @@ class GemmaClient(private val context: Context)
     //avoid calling llm too much
     suspend fun analyzeText(entryText: String): String? {
         val prompt = """
-            Analyze the following diary entry, if the diary entry is short, return NULL,or return a JSON with, Also Note:
-             You can only return three tags for now
-            - mood, moodConfidence, summary, reflectionQuestions, writingStyle, emotionDistribution, stressLevel, tone, tags
-            Entry:
-            "$entryText"
+            Analyze the following diary entry and return a JSON with these exact fields:
+            - mood: string (positive/negative/neutral)
+            - moodConfidence: number (0.0 to 1.0)
+            - summary: string (brief summary)
+            - reflectionQuestions: string (1-2 questions)
+            - writingStyle: string (brief description)
+            - emotionDistribution: object (e.g., {"joy": 0.8, "peace": 0.2})
+            - stressLevel: number (0-10 integer)
+            - tone: string (brief description)
+            - self-help: string (brief coping suggestion)
+            - tags: array of 3 strings maximum
+            
+            Return only valid JSON. For stressLevel use integers 0-10. For self-help, provide a concise suggestion.
+            
+            Entry: "$entryText"
         """.trimIndent()
 
         return withContext(Dispatchers.Default) {

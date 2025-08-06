@@ -39,12 +39,37 @@ object GemmaParser {
                 mood = json.optString("mood"),
                 moodConfidence = json.optDouble("moodConfidence", -1.0).toFloat().takeIf { it >= 0 },
                 summary = json.optString("summary"),
-                reflectionQuestions = json.optJSONArray("reflectionQuestions")
-                    ?.let { arr -> (0 until arr.length()).joinToString(", ") { i -> arr.getString(i) } },
+                reflectionQuestions = when {
+                    json.has("reflectionQuestions") -> {
+                        val reflectionValue = json.get("reflectionQuestions")
+                        when (reflectionValue) {
+                            is org.json.JSONArray -> (0 until reflectionValue.length()).joinToString(", ") { i -> reflectionValue.getString(i) }
+                            else -> reflectionValue.toString()
+                        }
+                    }
+                    else -> null
+                },
                 writingStyle = json.optString("writingStyle"),
                 emotionDistribution = json.optJSONObject("emotionDistribution")?.toString(),
-                stressLevel = json.optInt("stressLevel", -1).takeIf { it >= 0 },
-                tone = json.optString("tone")
+                stressLevel = when {
+                    json.has("stressLevel") -> {
+                        val stressValue = json.get("stressLevel")
+                        when (stressValue) {
+                            is Int -> stressValue
+                            is String -> when (stressValue.lowercase()) {
+                                "low" -> 2
+                                "medium", "moderate" -> 5
+                                "high" -> 8
+                                else -> stressValue.toIntOrNull() ?: -1
+                            }
+                            else -> -1
+                        }
+                    }
+                    else -> -1
+                }?.takeIf { it >= 0 },
+                tone = json.optString("tone"),
+                selfhelp = json.optString("self-help").takeIf { it.isNotBlank() } 
+                    ?: json.optString("selfhelp").takeIf { it.isNotBlank() }
             )
 
             val tags = json.optJSONArray("tags")
@@ -53,6 +78,8 @@ object GemmaParser {
 
             AnalysisResult(analysis, tags)
         } catch (e: Exception) {
+            Log.e("GemmaParser", "Failed to parse JSON response: ${e.message}")
+            Log.e("GemmaParser", "Raw response: $reply")
             e.printStackTrace()
             null
         }

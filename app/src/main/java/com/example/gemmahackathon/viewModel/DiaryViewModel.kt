@@ -50,32 +50,47 @@ class DiaryViewModel(
     private val dispatchers: DispatcherProvider = DefaultDispatchers,
 ) : ViewModel() {
 
-    //state
+    //state, THIS IS GLOBAL UI, does not need to change
     private val _uiState = MutableStateFlow(DiaryUiState())
     val uiState: StateFlow<DiaryUiState> = _uiState.asStateFlow()
 
-    private val _mood = MutableStateFlow<String?>(null)
+    //Converting all the single vaalue state flow into a map based flow
+    private val _mood            = MutableStateFlow<String?>(null)
     val mood: StateFlow<String?> = _mood.asStateFlow()
 
-    private val _moodConfidence = MutableStateFlow<Float?>(null)
-    val moodConfidence: StateFlow<Float?> = _moodConfidence.asStateFlow()
+    private val _moodConfidence            = MutableStateFlow<Float?>(null)
+    val moodConfidence: StateFlow<Float?>  = _moodConfidence.asStateFlow()
 
-    private val _summary = MutableStateFlow<String?>(null)
-    val summary: StateFlow<String?> = _summary.asStateFlow()
+    private val _stressLevel            = MutableStateFlow<Int?>(null)
+    val stressLevel: StateFlow<Int?>   = _stressLevel.asStateFlow()
 
-    private val _tone = MutableStateFlow<String?>(null)
-    val tone: StateFlow<String?> = _tone.asStateFlow()
-
-    private val _stressLevel = MutableStateFlow<Int?>(null)
-    val stressLevel: StateFlow<Int?> = _stressLevel.asStateFlow()
-
-    private val _emotionDistribution = MutableStateFlow<String?>(null)
+    private val _emotionDistribution            = MutableStateFlow<String?>(null)
     val emotionDistribution: StateFlow<String?> = _emotionDistribution.asStateFlow()
 
-    private val _reflectionQuestions = MutableStateFlow<String?>(null)
+    /* --- per-entry maps used by the chart screen --- */
+    private val _moodMap           = MutableStateFlow<Map<Long, String?>>(emptyMap())
+    val moodMap: StateFlow<Map<Long, String?>> = _moodMap.asStateFlow()
+
+    private val _confidenceMap     = MutableStateFlow<Map<Long, Float?>>(emptyMap())
+    val confidenceMap: StateFlow<Map<Long, Float?>> = _confidenceMap.asStateFlow()
+
+    private val _stressMap         = MutableStateFlow<Map<Long, Int?>>(emptyMap())
+    val stressMap: StateFlow<Map<Long, Int?>> = _stressMap.asStateFlow()
+
+    private val _emotionMap        = MutableStateFlow<Map<Long, String?>>(emptyMap())
+    val emotionMap: StateFlow<Map<Long, String?>> = _emotionMap.asStateFlow()
+
+    /* --- optional extras kept as single values --- */
+    private val _summary            = MutableStateFlow<String?>(null)
+    val summary: StateFlow<String?> = _summary.asStateFlow()
+
+    private val _tone            = MutableStateFlow<String?>(null)
+    val tone: StateFlow<String?> = _tone.asStateFlow()
+
+    private val _reflectionQuestions            = MutableStateFlow<String?>(null)
     val reflectionQuestions: StateFlow<String?> = _reflectionQuestions.asStateFlow()
 
-    private val _writingStyle = MutableStateFlow<String?>(null)
+    private val _writingStyle            = MutableStateFlow<String?>(null)
     val writingStyle: StateFlow<String?> = _writingStyle.asStateFlow()
 
     /* One-shot events */
@@ -158,8 +173,9 @@ class DiaryViewModel(
     fun loadMood(entryId: Long) {
         viewModelScope.launch(dispatchers.io) {
             try {
-                val result = diaryDao.getMoodForEntry(entryId)
-                _mood.value = result
+                val result = diaryDao.getMoodForEntry(entryId)      // String?
+                _mood.value = result                                // keep old API happy
+                _moodMap.update { it + (entryId to result) }        // chart data
             } catch (e: Exception) {
                 _events.emit(DiaryUiEvent.ShowError("Error loading mood: ${e.message}"))
             }
@@ -180,21 +196,23 @@ class DiaryViewModel(
     fun loadMoodConfidence(entryId: Long) {
         viewModelScope.launch(dispatchers.io) {
             try {
-                val result = diaryDao.getMoodConfidence(entryId)
+                val result = diaryDao.getMoodConfidence(entryId)    // Float?
                 _moodConfidence.value = result
+                _confidenceMap.update { it + (entryId to result) }
             } catch (e: Exception) {
-                _events.emit(DiaryUiEvent.ShowError("Error loading summary: ${e.message}"))
+                _events.emit(DiaryUiEvent.ShowError("Error loading confidence: ${e.message}"))
             }
         }
     }
 
-    fun getStressLevel(entryId: Long) {
+    fun loadStressLevel(entryId: Long) {
         viewModelScope.launch(dispatchers.io) {
             try {
-                val result = diaryDao.getMoodConfidence(entryId)
-                _moodConfidence.value = result
+                val result = diaryDao.getStressLevel(entryId)       // Int?
+                _stressLevel.value = result
+                _stressMap.update { it + (entryId to result) }
             } catch (e: Exception) {
-                _events.emit(DiaryUiEvent.ShowError("Error loading summary: ${e.message}"))
+                _events.emit(DiaryUiEvent.ShowError("Error loading stress level: ${e.message}"))
             }
         }
     }
@@ -209,20 +227,14 @@ class DiaryViewModel(
         }
     }
 
-    fun loadStressLevel(entryId: Long) {
-        viewModelScope.launch(dispatchers.io) {
-            try {
-                _stressLevel.value = diaryDao.getStressLevel(entryId)
-            } catch (e: Exception) {
-                _events.emit(DiaryUiEvent.ShowError("Error loading stress level: ${e.message}"))
-            }
-        }
-    }
+
 
     fun loadEmotionDistribution(entryId: Long) {
         viewModelScope.launch(dispatchers.io) {
             try {
-                _emotionDistribution.value = diaryDao.getEmotionDistribution(entryId)
+                val result = diaryDao.getEmotionDistribution(entryId) // String?
+                _emotionDistribution.value = result
+                _emotionMap.update { it + (entryId to result) }
             } catch (e: Exception) {
                 _events.emit(DiaryUiEvent.ShowError("Error loading emotion distribution: ${e.message}"))
             }
