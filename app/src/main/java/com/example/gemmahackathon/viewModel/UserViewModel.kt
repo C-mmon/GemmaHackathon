@@ -28,7 +28,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(visualMoodColour = colorHex)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -38,7 +37,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(name = newName)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -48,7 +46,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(about = newAbout)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -58,7 +55,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(moodSensitivityLevel = level)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -68,7 +64,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(thinkingStyle = style)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -78,7 +73,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(learningStyle = style)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -88,7 +82,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(writingStyle = style)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -98,7 +91,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(emotionalStrength = strength)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -108,7 +100,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(emotionalWeakness = weakness)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -118,7 +109,6 @@ class UserViewModel @Inject constructor(
             _user.value?.let {
                 val updated = it.copy(emotionalSignature = signature)
                 userDao.update(updated)
-                _user.value = updated
             }
         }
     }
@@ -141,7 +131,6 @@ class UserViewModel @Inject constructor(
                     emotionalSignature = null
                 )
                 userDao.insert(newUser)
-                _user.value = newUser
             }
         }
     }
