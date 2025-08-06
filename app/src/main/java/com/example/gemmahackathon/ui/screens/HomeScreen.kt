@@ -31,6 +31,7 @@ fun HomeScreen(
 ) {
     val uiState by diaryViewModel.uiState.collectAsState()
     val reflectionQuestions by diaryViewModel.reflectionQuestions.collectAsState()
+    val selfHelp by diaryViewModel.selfHelp.collectAsState()
     val summary by diaryViewModel.summary.collectAsState()
     val events by diaryViewModel.events.collectAsState(initial = null)
 
@@ -58,7 +59,8 @@ fun HomeScreen(
         if (latestEntry != null && latestEntry.diaryEntry.id != lastCreatedEntryId) {
             lastCreatedEntryId = latestEntry.diaryEntry.id
             diaryViewModel.loadSummary(latestEntry.diaryEntry.id)
-            diaryViewModel.loadReflectionQuestions(latestEntry.diaryEntry.id)
+                            diaryViewModel.loadReflectionQuestions(latestEntry.diaryEntry.id)
+                diaryViewModel.loadSelfHelp(latestEntry.diaryEntry.id)
         }
     }
 
@@ -149,6 +151,23 @@ fun HomeScreen(
                                 )
                             }
                         }
+                    }
+                }
+            }
+
+            // Self-Help Section
+            if (!selfHelp.isNullOrBlank() && !uiState.isLoading) {
+                item {
+                    DiaryCard {
+                        SectionHeader("💡 Self-Help Suggestion")
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = selfHelp!!,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF4CAF50), // Green color for self-help
+                            lineHeight = 18.sp
+                        )
                     }
                 }
             }

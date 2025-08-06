@@ -90,6 +90,9 @@ class DiaryViewModel(
     private val _reflectionQuestions            = MutableStateFlow<String?>(null)
     val reflectionQuestions: StateFlow<String?> = _reflectionQuestions.asStateFlow()
 
+    private val _selfHelp            = MutableStateFlow<String?>(null)
+    val selfHelp: StateFlow<String?> = _selfHelp.asStateFlow()
+
     private val _writingStyle            = MutableStateFlow<String?>(null)
     val writingStyle: StateFlow<String?> = _writingStyle.asStateFlow()
 
@@ -112,7 +115,7 @@ class DiaryViewModel(
             //Change a mutable state variable isLoading to true
             setLoading(true)
             
-            runCatching {
+        runCatching {
             /* 1. Insert entry */
             Log.d("DiaryViewModel", "Inserting diary entry: $text")
             val entryId = diaryDao.insert(DiaryEntry(text = text, isDeleted = false))
@@ -147,10 +150,10 @@ class DiaryViewModel(
                 // Asynchronously generate and update user emotional signature
                 // This runs in the background and doesn't block the UI
                 generateUserEmotionalSignatureAsync(text, finalEntryId)
-            }.onFailure { throwable ->
-                _events.emit(DiaryUiEvent.ShowError(throwable.message ?: "Unknown error"))
-            }
-            setLoading(false)
+        }.onFailure { throwable ->
+            _events.emit(DiaryUiEvent.ShowError(throwable.message ?: "Unknown error"))
+        }
+        setLoading(false)
         }
     }
 
@@ -255,6 +258,16 @@ class DiaryViewModel(
                 _reflectionQuestions.value = diaryDao.getReflectionQuestions(entryId)
             } catch (e: Exception) {
                 _events.emit(DiaryUiEvent.ShowError("Error loading reflection questions: ${e.message}"))
+            }
+        }
+    }
+
+    fun loadSelfHelp(entryId: Long) {
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                _selfHelp.value = diaryDao.getSelfHelp(entryId)
+            } catch (e: Exception) {
+                _events.emit(DiaryUiEvent.ShowError("Error loading self-help: ${e.message}"))
             }
         }
     }

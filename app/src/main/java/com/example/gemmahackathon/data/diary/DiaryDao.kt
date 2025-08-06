@@ -87,6 +87,9 @@ interface DiaryDao {
     @Query("SELECT reflectionQuestions FROM DiaryAnalysis WHERE entryId = :entryId")
     suspend fun getReflectionQuestions(entryId: Long): String?
 
+    @Query("SELECT selfhelp FROM DiaryAnalysis WHERE entryId = :entryId")
+    suspend fun getSelfHelp(entryId: Long): String?
+
     @Query("SELECT writingStyle FROM DiaryAnalysis WHERE entryId = :entryId")
     suspend fun getWritingStyle(entryId: Long): String?
 
