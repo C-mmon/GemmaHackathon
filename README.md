@@ -327,7 +327,7 @@ implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
 ## Conclusion
 
-MindfulMoments represents a breakthrough in privacy-preserving mental health technology, leveraging the power of Gemma 3n to deliver sophisticated psychological insights entirely on-device. Our dual-layer AI analysis system, combined with adaptive personality modeling, creates a truly personalized mental wellness companion that grows with the user while maintaining absolute privacy.
+Dear Diary represents a breakthrough in privacy-preserving mental health technology, leveraging the power of Gemma 3n to deliver sophisticated psychological insights entirely on-device. Our dual-layer AI analysis system, combined with adaptive personality modeling, creates a truly personalized mental wellness companion that grows with the user while maintaining absolute privacy.
 
 The technical architecture demonstrates innovative use of Google's AI Edge technologies, overcoming significant engineering challenges to deliver a production-ready solution that could genuinely impact millions of lives worldwide.
 
